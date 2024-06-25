@@ -3,7 +3,9 @@ import { AppBar, Toolbar, Typography, IconButton, Button, ThemeProvider, createT
 import MenuIcon from "@mui/icons-material/Menu";
 import {theme} from "./theme/theme.js";
 import PatientProfile from "./features/profile/PatientProfile.jsx";
-import {Chat} from "@mui/icons-material";
+// import {Chat} from "@mui/icons-material";
+import Chat from "./features/chat/Chat.jsx";
+
 
 
 const sampleData = {
