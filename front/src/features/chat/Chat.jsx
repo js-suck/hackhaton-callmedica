@@ -1,6 +1,5 @@
 import {
   Box,
-  Container,
   Fab,
   TextField,
   Typography,
@@ -12,7 +11,7 @@ import React, { useState } from "react";
 import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 
-const Chat = () => {
+const Chat = ({ userId }) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
@@ -29,15 +28,20 @@ const Chat = () => {
     if (message.trim() !== "") {
       const userMessage = { role: "user", content: message };
       const newChatHistory = [...chatHistory, userMessage];
+    //   const userId = 1;
 
       try {
-        const response = await fetch("http://localhost:3002/api/ask", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ messages: newChatHistory }),
-        });
+        console.log(newChatHistory);
+        const response = await fetch(
+          `http://localhost:3002/api/${userId}/ask`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ messages: newChatHistory }),
+          }
+        );
         const data = await response.text();
         const botMessage = { role: "assistant", content: data };
         setChatHistory([...newChatHistory, botMessage]);
@@ -95,7 +99,7 @@ const Chat = () => {
           </Box>
           <Box
             sx={{
-              backgroundColor:"grey.100",
+              backgroundColor: "grey.100",
               flex: 1,
               overflowY: "auto",
               p: 2,
@@ -108,8 +112,7 @@ const Chat = () => {
                   mb: 1,
                   p: 1,
                   borderRadius: 2,
-                  backgroundColor:
-                    chat.role === "user" ? "#ff5722b8" : "white",
+                  backgroundColor: chat.role === "user" ? "#ff5722b8" : "white",
                   alignSelf: chat.role === "user" ? "flex-start" : "flex-end",
                   color: chat.role === "user" ? "white" : "black",
                   textAlign: chat.role === "user" ? "right" : "left",
