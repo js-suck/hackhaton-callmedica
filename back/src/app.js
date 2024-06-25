@@ -55,7 +55,6 @@ app.post('/api/:userId/ask', async(req, res) => {
     });
 
     const responseContent = gptResponse.choices[0].message.content;
-    console.log(responseContent);
     // Parse the response content to extract the typeOfReport and report
     const parsedResponse = JSON.parse(responseContent);
 
