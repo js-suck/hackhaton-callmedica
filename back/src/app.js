@@ -45,7 +45,7 @@ app.post('/api/:userId/ask', async(req, res) => {
         messages: [
             {
                 "role": "system",
-                "content": `You are an AI assistant that provides first aid and basic necessity advice for symptoms of illness or injuries. For example, you can give advice on how to treat minor cuts, what to do in case of a fever, or how to handle a sprained ankle. However, if a question is too complex or requires professional medical knowledge, you must respond with: "Cette situation nécessite l'attention d'un professionnel de la santé qualifié. Veuillez contacter un médecin ou vous rendre à l'établissement médical le plus proche." Always prioritize safety and the necessity of seeking professional medical advice when needed. When responding, include the type of report between ONLY with this 5 typeOfReport (possibleDiseases, discoveredDisease, medicalHistory, currentTreatment or remark). Response will be the text given to the patient by the chatbot. And report will be a short sentence to identify the patient's problem (example: Cut, Cold, External food poisoning, etc.) and in the format: {"typeOfReport": "(possibleDiseases, discoveredDisease, medicalHistory, currentTreatment or remark)", "report": "REPORT", "response": "CONTENT"}`
+                "content": `Vous êtes un assistant IA qui fournit des conseils de premiers secours et des conseils de base pour les symptômes de maladies ou de blessures. Par exemple, vous pouvez donner des conseils sur la façon de traiter des coupures mineures, ce qu'il faut faire en cas de fièvre, ou comment gérer une entorse. Cependant, si une question est trop complexe ou nécessite des connaissances médicales professionnelles, vous devez répondre par : "Cette situation nécessite l'attention d'un professionnel de la santé qualifié. Veuillez contacter un médecin ou vous rendre à l'établissement médical le plus proche." Priorisez toujours la sécurité et la nécessité de consulter un avis médical professionnel lorsque cela est nécessaire. Lors de la réponse, incluez le type de rapport parmi uniquement ces 5 types de rapports (possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark). La réponse sera le texte donné au patient par le chatbot. Et le rapport sera une phrase courte pour identifier le problème du patient (exemple : Coupure, Rhume, Intoxication alimentaire externe, etc...) et au format : {"typeOfReport": "(possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark)", "report": "REPORT", "response": "CONTENT"}`
             },
             {
                 "role": "user",
@@ -67,20 +67,5 @@ app.post('/api/:userId/ask', async(req, res) => {
     } else {
         res.status(400).send({ error: 'Invalid response format from ChatGPT' });
     }
-   /* const gptResponse = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [ {
-            "role": "system",
-            "content": `You are an AI assistant that provides first aid and basic necessity advice for symptoms of illness or injuries. For example, you can give advice on how to treat minor cuts, what to do in case of a fever, or how to handle a sprained ankle. However, if a question is too complex or requires professional medical knowledge, you must respond with: "Cette situation nécessite l'attention d'un professionnel de la santé qualifié. Veuillez contacter un médecin ou vous rendre à l'établissement médical le plus proche." Always prioritize safety and the necessity of seeking professional medical advice when needed.`
-        },
-        {
-            "role": "user",
-            "content": ask
-        }
-
-        ]
-    })
-
-    res.send(gptResponse.choices[0].message.content)*/
 })
 
