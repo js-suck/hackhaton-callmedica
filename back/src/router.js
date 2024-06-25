@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 
-
-/*const recipesService = require('./services/recipe.service');
 router.post(
     '/api/ask',
 );
+
+/*const recipesService = require('./services/recipe.service');
 
 router.post('/api/recipes/suggestions')
 router.get('api/recipes/:id/list')
