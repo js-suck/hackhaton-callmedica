@@ -79,6 +79,7 @@ const Chat = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              borderRadius: 1,
               p: 2,
               borderBottom: 1,
               borderColor: "divider",
@@ -105,7 +106,7 @@ const Chat = () => {
                   p: 1,
                   borderRadius: 1,
                   backgroundColor:
-                    chat.sender === "user" ? "grey.300" : "grey.600",
+                    chat.sender === "user" ? "grey.200" : "grey.400",
                   alignSelf: chat.sender === "user" ? "flex-end" : "flex-start",
                   color: chat.sender === "user" ? "black" : "white",
                   textAlign: chat.sender === "user" ? "right" : "left",
