@@ -3,7 +3,7 @@ const router = express.Router();
 
 
 router.post(
-    '/api/ask',
+    '/api/:userId/ask',
 );
 
 /*const recipesService = require('./services/recipe.service');
