@@ -87,32 +87,34 @@ const sampleData = {
     }
 }
 function App() {
+  const userId = 1; 
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AppBar position="static">
+        <Toolbar
+          sx={{
+            width: "100%",
+            maxWidth: "none",
+            justifyContent: "space-between",
+          }}
+        >
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6">CallMedica</Typography>
+          <Button color="inherit">Login</Button>
+        </Toolbar>
+      </AppBar>
 
-
-    return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AppBar position="static">
-                <Toolbar sx={{ width: '100%', maxWidth: 'none', justifyContent: 'space-between' }}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6">
-                        CallMedica
-                    </Typography>
-                    <Button color="inherit">Login</Button>
-                </Toolbar>
-            </AppBar>
-
-         <Chat />
-
-        </ThemeProvider>
-    );
+      <Chat userId={userId} />
+    </ThemeProvider>
+  );
 }
 
 export default App;

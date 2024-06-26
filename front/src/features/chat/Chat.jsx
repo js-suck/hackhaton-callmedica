@@ -1,18 +1,17 @@
 import {
   Box,
-  Container,
   Fab,
   TextField,
   Typography,
   Paper,
   IconButton,
-  Button, 
+  Button,
 } from "@mui/material";
 import React, { useState } from "react";
 import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 
-const Chat = () => {
+const Chat = ({ userId }) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
@@ -27,20 +26,25 @@ const Chat = () => {
 
   const handleSendMessage = async () => {
     if (message.trim() !== "") {
-      const userMessage = { sender: "user", text: message };
-      setChatHistory([...chatHistory, userMessage]);
+      const userMessage = { role: "user", content: message };
+      const newChatHistory = [...chatHistory, userMessage];
+    //   const userId = 1;
 
       try {
-        const response = await fetch("/api/chatbot", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message }),
-        });
-        const data = await response.json();
-        const botMessage = { sender: "bot", text: data.reply };
-        setChatHistory([...chatHistory, userMessage, botMessage]);
+        console.log(newChatHistory);
+        const response = await fetch(
+          `http://localhost:3002/api/${userId}/ask`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ messages: newChatHistory }),
+          }
+        );
+        const data = await response.text();
+        const botMessage = { role: "assistant", content: data };
+        setChatHistory([...newChatHistory, botMessage]);
         setMessage("");
       } catch (error) {
         console.error("Error sending message to chatbot API", error);
@@ -83,16 +87,19 @@ const Chat = () => {
               p: 2,
               borderBottom: 1,
               borderColor: "divider",
-              backgroundColor: "primary.main",
+              backgroundColor: "white",
             }}
           >
-            <Typography variant="h6" color="white" >Chat</Typography>
+            <Typography variant="h6" color="black">
+              Chat
+            </Typography>
             <IconButton onClick={handleClose}>
-              <CloseIcon/>
+              <CloseIcon />
             </IconButton>
           </Box>
           <Box
             sx={{
+              backgroundColor: "grey.100",
               flex: 1,
               overflowY: "auto",
               p: 2,
@@ -104,18 +111,22 @@ const Chat = () => {
                 sx={{
                   mb: 1,
                   p: 1,
-                  borderRadius: 1,
-                  backgroundColor:
-                    chat.sender === "user" ? "grey.200" : "grey.400",
-                  alignSelf: chat.sender === "user" ? "flex-end" : "flex-start",
-                  color: chat.sender === "user" ? "black" : "white",
-                  textAlign: chat.sender === "user" ? "right" : "left",
+                  borderRadius: 2,
+                  backgroundColor: chat.role === "user" ? "#ff5722b8" : "white",
+                  alignSelf: chat.role === "user" ? "flex-start" : "flex-end",
+                  color: chat.role === "user" ? "white" : "black",
+                  textAlign: chat.role === "user" ? "right" : "left",
                 }}
               >
-                <Typography variant="body2">{chat.text}</Typography>
-                {chat.sender === "user" && (
+                <Typography variant="body2">{chat.content}</Typography>
+                {chat.role === "user" && (
                   <Typography variant="caption" display="block">
                     You
+                  </Typography>
+                )}
+                {chat.role === "assistant" && (
+                  <Typography variant="caption" display="block">
+                    CallMedica
                   </Typography>
                 )}
               </Box>
