@@ -4,6 +4,10 @@ const UserReports = require("../models/userReport.model");
 require("dotenv-flow").config();
 
 class UserService {
+    static async getUsers() {
+        return await User.findAll();
+    }
+
     static async getUserReport(userId) {
         const user = await User.findByPk(userId);
 
