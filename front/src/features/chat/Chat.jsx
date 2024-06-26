@@ -6,15 +6,29 @@ import {
   Paper,
   IconButton,
   Button,
+  Menu,
+  MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import React, { useState } from "react";
 import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+
+const preRecordedMessages = [
+  "J'ai une coupure. Que dois-je faire ?",
+  "J'ai de la fièvre. Quels sont les conseils ?",
+  "Comment gérer une entorse ?",
+  "Quels sont les symptômes de l'intoxication alimentaire ?",
+  "Que faire en cas de brûlure mineure ?",
+];
 
 const Chat = ({ userId }) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(!open);
@@ -24,14 +38,14 @@ const Chat = ({ userId }) => {
     setOpen(false);
   };
 
-  const handleSendMessage = async () => {
-    if (message.trim() !== "") {
-      const userMessage = { role: "user", content: message };
+  const handleSendMessage = async (messageToSend) => {
+    if (messageToSend.trim() !== "") {
+      const userMessage = { role: "user", content: messageToSend };
       const newChatHistory = [...chatHistory, userMessage];
-    //   const userId = 1;
+
+      setLoading(true); // Start loading
 
       try {
-        console.log(newChatHistory);
         const response = await fetch(
           `http://localhost:3002/api/${userId}/ask`,
           {
@@ -48,8 +62,23 @@ const Chat = ({ userId }) => {
         setMessage("");
       } catch (error) {
         console.error("Error sending message to chatbot API", error);
+      } finally {
+        setLoading(false); // End loading
       }
     }
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handlePreRecordedMessageClick = (message) => {
+    handleSendMessage(message);
+    handleMenuClose();
   };
 
   return (
@@ -131,6 +160,18 @@ const Chat = ({ userId }) => {
                 )}
               </Box>
             ))}
+            {loading && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            )}
           </Box>
           <Box
             sx={{
@@ -149,15 +190,40 @@ const Chat = ({ userId }) => {
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
-                  handleSendMessage();
+                  handleSendMessage(message);
                 }
               }}
               sx={{ mr: 2 }}
             />
+            <IconButton
+              aria-label="more"
+              aria-controls="long-menu"
+              aria-haspopup="true"
+              onClick={handleMenuClick}
+              sx={{ mr: 2 }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="long-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              {preRecordedMessages.map((msg, index) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => handlePreRecordedMessageClick(msg)}
+                >
+                  {msg}
+                </MenuItem>
+              ))}
+            </Menu>
             <Button
               variant="contained"
               color="primary"
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage(message)}
             >
               Send
             </Button>
