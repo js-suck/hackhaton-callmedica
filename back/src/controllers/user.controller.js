@@ -11,7 +11,15 @@ const getUserReport = async (req, res) => {
     res.json(userReport);
 }
 
+const updateUserReports = async (req, res) => {
+    const { userId } = req.params;
+    const reportUpdates = req.body;
+    await UserService.updateUserReports(userId, reportUpdates);
+    res.json({ message: "User report updated" });
+}
+
 module.exports = {
     getUsers,
-    getUserReport
+    getUserReport,
+    updateUserReports,
 };
