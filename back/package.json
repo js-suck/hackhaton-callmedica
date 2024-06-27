@@ -4,6 +4,8 @@
     "fixtures": "node scripts/fixtures/runFixtures.js"
   },
   "dependencies": {
+    "@google-cloud/speech": "^6.6.1",
+    "@google-cloud/storage": "^7.11.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
