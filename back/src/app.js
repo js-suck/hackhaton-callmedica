@@ -55,6 +55,7 @@ app.use("/api/user", userRoutes);
 app.post("/api/:userId/ask", async (req, res) => {
   const { userId } = req.params;
   const { messages } = req.body;
+  console.log(messages)
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
