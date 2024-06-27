@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime"; // Ajoutez cette ligne en haut
 import {
   Box,
   Fab,
@@ -14,6 +15,10 @@ import React, { useState } from "react";
 import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MicIcon from "@mui/icons-material/Mic";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 const preRecordedMessages = [
   "J'ai une coupure. Que dois-je faire ?",
@@ -29,6 +34,17 @@ const Chat = ({ userId }) => {
   const [chatHistory, setChatHistory] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
 
   const handleClickOpen = () => {
     setOpen(!open);
@@ -60,6 +76,7 @@ const Chat = ({ userId }) => {
         const botMessage = { role: "assistant", content: data };
         setChatHistory([...newChatHistory, botMessage]);
         setMessage("");
+        resetTranscript();
       } catch (error) {
         console.error("Error sending message to chatbot API", error);
       } finally {
@@ -79,6 +96,22 @@ const Chat = ({ userId }) => {
   const handlePreRecordedMessageClick = (message) => {
     handleSendMessage(message);
     handleMenuClose();
+  };
+
+  const handleMicClick = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      SpeechRecognition.startListening({
+        continuous: false,
+        language: "fr-FR",
+      });
+    }
+  };
+
+  const handleResetTranscript = () => {
+    resetTranscript();
+    setMessage("");
   };
 
   return (
@@ -180,53 +213,77 @@ const Chat = ({ userId }) => {
               borderColor: "divider",
               display: "flex",
               alignItems: "center",
+              flexDirection: "column",
             }}
           >
             <TextField
               label="Your Message"
               variant="outlined"
               fullWidth
-              value={message}
+              value={message || transcript}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
-                  handleSendMessage(message);
+                  handleSendMessage(message || transcript);
                 }
               }}
-              sx={{ mr: 2 }}
+              sx={{ mb: 2 }}
             />
-            <IconButton
-              aria-label="more"
-              aria-controls="long-menu"
-              aria-haspopup="true"
-              onClick={handleMenuClick}
-              sx={{ mr: 2 }}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
             >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="long-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              {preRecordedMessages.map((msg, index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => handlePreRecordedMessageClick(msg)}
-                >
-                  {msg}
-                </MenuItem>
-              ))}
-            </Menu>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleSendMessage(message)}
-            >
-              Send
-            </Button>
+              <IconButton
+                aria-label="mic"
+                onClick={handleMicClick}
+                sx={{ mr: 2 }}
+              >
+                <MicIcon color={listening ? "primary" : "inherit"} />
+              </IconButton>
+              <IconButton
+                aria-label="reset"
+                onClick={handleResetTranscript}
+                sx={{ mr: 2 }}
+              >
+                <CloseIcon />
+              </IconButton>
+              <IconButton
+                aria-label="more"
+                aria-controls="long-menu"
+                aria-haspopup="true"
+                onClick={handleMenuClick}
+                sx={{ mr: 2 }}
+              >
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                id="long-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                {preRecordedMessages.map((msg, index) => (
+                  <MenuItem
+                    key={index}
+                    onClick={() => handlePreRecordedMessageClick(msg)}
+                  >
+                    {msg}
+                  </MenuItem>
+                ))}
+              </Menu>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleSendMessage(message || transcript)}
+              >
+                Send
+              </Button>
+            </Box>
           </Box>
         </Box>
       )}
