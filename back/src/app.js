@@ -20,7 +20,7 @@ const storage = new Storage();
 const client = new SpeechClient();
 const bucketName = 'testbucket-hackathon';
 const localAudioPath = '/Users/ramis/Desktop/extrait.wav';
-const remoteFileName = 'extrait.wav';
+const remoteFileName = '../audio/extrait2.wav';
 // Définir le chemin des informations d'identification
 const CREDENTIALS_PATH = "/Users/ramis/Desktop/single-being-427608-h9-336be855846f.json";
 const openai = new OpenAI({
@@ -115,7 +115,6 @@ async function uploadFileToGCS(localFilePath, remoteFileName) {
             destination: remoteFileName,
         });
 
-        console.log(`Fichier ${localFilePath} uploadé sur GCS avec le nom ${remoteFileName}`);
         return `gs://${bucketName}/${remoteFileName}`;
     } catch (err) {
         console.error('Erreur lors de l\'upload du fichier sur GCS :', err);
@@ -153,7 +152,6 @@ app.post('/api/:userId/speech', async (req, res) => {
         const [operation] = await client.longRunningRecognize(request);
 
         const [response] = await operation.promise();
-        console.log(response.results);
 
         const transcription = response.results.map(result => ({
             person: result.channelTag || 'Unknown',
@@ -187,7 +185,6 @@ app.post('/api/:userId/speech', async (req, res) => {
         }
         res.json(data);
     } catch (error) {
-        console.error('Erreur lors de la transcription :', error);
         res.status(500).send('Erreur lors de la transcription');
     }
 });
