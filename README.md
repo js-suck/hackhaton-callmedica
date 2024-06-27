@@ -1,11 +1,14 @@
-# Projet Hackathon CallMedica
+# Projet Hackathon CalMedica
 
-Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous analysons automatiquement les messages vocaux et écrits des patients, transcrivons les enregistrements audio et générons des fiches patients détaillées et dynamiques. Chaque fiche intègre un suivi continu basé sur l'analyse des vidéos et des SMS. En cas de besoin, notre système offre des réponses automatiques avec des conseils simples et essentiels pour les patients.
+Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous analysons automatiquement les messages vocaux et écrits des patients, transcrivons les enregistrements audio et générons des fiches patients détaillées et dynamiques. Chaque fiche intègre un suivi continu basé sur l'analyse des appels et des SMS. En cas de besoin, notre système offre des réponses automatiques avec des conseils simples et essentiels pour les patients.
 
 ## Fonctionnalités
 
 - **Chatbot IA** : Intégration d'un chatbot utilisant l'API OpenAI pour fournir des conseils de premiers secours et des informations médicales de base avec reconnaissance vocale.
   - **Auteur** : Antoine Chabernaud 5IW2 / [senex127](https://github.com/senex127) 
+
+- **Gestion des fiches patient** : Création, modification et récupération des fiches patient avec gestion des différents types (Historiques médical, traitements, maladies possibles, etc.) ainsi que la récupération des patients enregistrés.
+  - **Auteur** : Vivian Ruhlmann 5IW2 / [Loviflo](https://github.com/Loviflo)
 
 - **Messages Préenregistrés** : Ajout d'un menu déroulant de messages préenregistrés pour aider les utilisateurs à poser rapidement des questions courantes.
   - **Auteur** : [Nom et Pseudo du Développeur]
@@ -45,7 +48,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 1. Clonez le repository :
    ```bash
    git clone https://github.com/js-suck/hackhaton-callmedica
-   cd votre-repository
+   cd hackhaton-callmedica
    ```
 
 2. Installez les dépendances pour le frontend et le backend :
@@ -53,13 +56,13 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
    - Frontend (React) :
      ```bash
      cd front
-     npm install
+     yarn
      ```
 
    - Backend (Node.js) :
      ```bash
      cd ../back
-     npm install
+     yarn
      ```
 
 ### Configuration
@@ -84,7 +87,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 
 2. Démarrez le serveur backend :
    ```bash
-   node scripts/fixtures/runFixtures.js
+   yarn fixtures
    yarn start
    ```
 
