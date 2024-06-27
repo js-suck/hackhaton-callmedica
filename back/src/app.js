@@ -20,7 +20,7 @@ const storage = new Storage();
 const client = new SpeechClient();
 const bucketName = 'testbucket-hackathon';
 const localAudioPath = '/Users/ramis/Desktop/extrait.wav';
-const remoteFileName = '../audio/extrait2.wav';
+const remoteFileName = 'extrait.wav';
 // Définir le chemin des informations d'identification
 const CREDENTIALS_PATH = "/Users/ramis/Desktop/single-being-427608-h9-336be855846f.json";
 const openai = new OpenAI({
@@ -55,11 +55,6 @@ app.use("/api/user", userRoutes);
 app.post("/api/:userId/ask", async (req, res) => {
   const { userId } = req.params;
   const { messages } = req.body;
-  console.log(messages)
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
   try {
     const gptResponse = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -157,9 +152,10 @@ app.post('/api/:userId/speech', async (req, res) => {
             person: result.channelTag || 'Unknown',
             text: result.alternatives[0].transcript || 'No transcription available',
         }));
+        console.log(transcription, 'transcription')
 
-        const transcriptionText = transcription.map(t => `Speaker ${t.speakerTag}: ${t.transcript}`).join('\n');
-
+        const transcriptionText = transcription.map(t => `Speaker ${t.person}: ${t.text}`).join('\n');
+        console.log(transcriptionText, 'transcriptionText')
         const completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [
@@ -173,7 +169,6 @@ app.post('/api/:userId/speech', async (req, res) => {
                 }
             ]
         });
-
         const summary = completion.choices[0].message.content;
         const data = ({
             sequences: transcription,
@@ -182,6 +177,30 @@ app.post('/api/:userId/speech', async (req, res) => {
         if (transcription && summary) {
             const userTranscriptionService = new UserTranscriptionService();
             await userTranscriptionService.add(userId, data);
+        }
+        console.log(summary);
+        const gptResponse = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                    "role": "system",
+                    "content": `Si tu trouve des information pertinente je veux que tu analyse ce résumé de la transcription d'un appele et que tu me ressorts lors de la réponse le type de rapport parmi uniquement ces 5 types de rapports (possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark). La réponse sera le texte donné au patient par le chatbot. Et le rapport sera une phrase courte pour identifier le problème du patient (exemple : Coupure, Rhume, Intoxication alimentaire externe, etc...) et au format : {"typeOfReport": "(possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark)", "report": "REPORT", "response": "CONTENT"}`
+                },
+                {
+                    "role": "user",
+                    "content": summary
+                }
+            ]
+        });
+
+        const responseContent = gptResponse.choices[0].message.content;
+        const parsedResponse = JSON.parse(responseContent);
+        console.log(parsedResponse)
+        if (parsedResponse.typeOfReport && parsedResponse.report) {
+            const userService = new UserReportService();
+            const userReport = await userService.add(userId, parsedResponse.typeOfReport, parsedResponse.report, true);
+        } else {
+            res.status(400).send({ error: 'Invalid response format from ChatGPT' });
         }
         res.json(data);
     } catch (error) {

@@ -2,7 +2,10 @@ const Error = require("sequelize").Error;
 const User = require("../models/user.model");
 const UserReports = require("../models/userReport.model");
 require("dotenv-flow").config();
-
+const OpenAI = require("openai");
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
 class UserService {
     static async getUsers() {
         return await User.findAll();
@@ -41,8 +44,24 @@ class UserService {
             discoveredDisease: filterReports("discoveredDisease"),
             medicalHistory: filterReports("medicalHistory"),
             currentTreatment: filterReports("currentTreatment"),
-            remarks: filterReports("remarks"),
+            remark: filterReports("remark"),
         };
+        const gptResponse = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                    "role": "system",
+                    "content": `Tu dois faire un résumé de donnée patient, le but est de rendre tous les informations du patient avec des phrases pas une liste (userInfo, possibleDiseases, discoveredDisease, medicalHistory, currentTreatment, remark) plus accéssible pour des médecins ou infermieres qui voudrais visionner la fiche de leurs patients`
+                },
+                {
+                    "role": "user",
+                    "content": JSON.stringify(userReport)
+                }
+            ]
+        });
+        const gptSummary = gptResponse.choices[0].message.content;
+
+        userReport.resume = { value: gptSummary, generatedByAI: true };
         return userReport;
     }
 
