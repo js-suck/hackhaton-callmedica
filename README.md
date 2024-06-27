@@ -84,6 +84,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 
 2. Démarrez le serveur backend :
    ```bash
+   node scripts/fixtures/runFixtures.js
    yarn start
    ```
 
