@@ -14,7 +14,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
   - **Auteur** : Vivian Ruhlmann 5IW2 / [Loviflo](https://github.com/Loviflo)
 
 - **Messages Préenregistrés** : Ajout d'un menu déroulant de messages préenregistrés pour aider les utilisateurs à poser rapidement des questions courantes.
-  - **Auteur** : [Nom et Pseudo du Développeur]
+  - **Auteur** : Antoine Chabernaud 5IW2 / [senex127](https://github.com/senex127) 
 
 - **Intégration Speech to Text** : Mise en place de la configuration du service Speech to Text de Google Cloud et enregistrement des conversations utilisateurs dans notre base de données.
   - **Auteur** : Lucas Ramis 5IW2 / [RamisL](https://github.com/RamisL)
@@ -180,3 +180,4 @@ const generateTranscription = async (req, res) => {
 - Vérifiez que la clé API OpenAI est valide et correctement configurée dans le fichier `.env`.
 
 Pour toute question ou problème, veuillez contacter l'un des développeurs de l'équipe.
+Numéro de la maman d'Antoine pour Baptiste : 01 48 10 31 00
