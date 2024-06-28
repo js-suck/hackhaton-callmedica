@@ -96,7 +96,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 
 3.  Téléchargez le fichier de clé JSON du nouveau compte de service  
 
-    ```process.env.GOOGLE_APPLICATION_CREDENTIALS = "/chemin/vers/votre-fichier-clé.json";``
+    ```process.env.GOOGLE_APPLICATION_CREDENTIALS = "/chemin/vers/votre-fichier-clé.json";```
 
 
 4. Pour les vidéos de plus de 1 mn, nous avons besoin de créer un bucket
