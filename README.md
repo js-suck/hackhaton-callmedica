@@ -83,14 +83,16 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 ### Configuration Speech to Text
 1. Activez le service sur Google Cloud console
 
-![Capture d’écran 2024-06-28 à 02.10.33.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2Fd7%2Fskc0c7gd4f5fs2ny810lp6b80000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_ennSHa%2FCapture%20d%E2%80%99%C3%A9cran%202024-06-28%20%C3%A0%2002.10.33.png)
+<img width="664" alt="Capture d’écran 2024-06-28 à 12 17 26" src="https://github.com/js-suck/hackhaton-callmedica/assets/45816433/d8fae5b3-13af-479f-b27b-3dc0d86ba258">
+
 
 2. Créez des identifiants de compte de service :
    - Allez sur Google Cloud Console.
    - Naviguez vers "API & Services" -> "Identifiants".
    - Cliquez sur "Créer des identifiants" et sélectionnez "Compte de service".
    
-![Capture d’écran 2024-06-28 à 02.17.44.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2Fd7%2Fskc0c7gd4f5fs2ny810lp6b80000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_Ulg3bF%2FCapture%20d%E2%80%99%C3%A9cran%202024-06-28%20%C3%A0%2002.17.44.png)
+<img width="647" alt="Capture d’écran 2024-06-28 à 12 18 13" src="https://github.com/js-suck/hackhaton-callmedica/assets/45816433/f3e1d871-cf06-49f4-b24d-cc8d1763b240">
+
 
 3.  Téléchargez le fichier de clé JSON du nouveau compte de service  
 
@@ -99,7 +101,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 
 4. Pour les vidéos de plus de 1 mn, nous avons besoin de créer un bucket
 
-![Capture d’écran 2024-06-28 à 02.19.08.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2Fd7%2Fskc0c7gd4f5fs2ny810lp6b80000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_yjVOOE%2FCapture%20d%E2%80%99%C3%A9cran%202024-06-28%20%C3%A0%2002.19.08.png)
+<img width="1309" alt="Capture d’écran 2024-06-28 à 12 19 14" src="https://github.com/js-suck/hackhaton-callmedica/assets/45816433/74691060-c000-482c-902a-345ba3b82ddb">
 
 ```
 const bucketName = 'testbucket-hackathon';
