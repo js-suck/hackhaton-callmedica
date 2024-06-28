@@ -99,10 +99,11 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
     ```process.env.GOOGLE_APPLICATION_CREDENTIALS = "/chemin/vers/votre-fichier-clé.json";```
 
 
-4. Pour les vidéos de plus de 1 mn, nous avons besoin de créer un bucket
+4. Pour les audios de plus de 1 mn, nous avons besoin de créer un bucket
 
 <img width="1309" alt="Capture d’écran 2024-06-28 à 12 19 14" src="https://github.com/js-suck/hackhaton-callmedica/assets/45816433/74691060-c000-482c-902a-345ba3b82ddb">
 
+- exemple :
 ```
 const bucketName = 'testbucket-hackathon';
 const remoteFileName = 'extrait.wav';
