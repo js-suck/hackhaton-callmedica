@@ -1,20 +1,26 @@
 const UserService = require('../services/user.service');
 const UserReportService = require("../services/userReport.service");
-const UserReport = require("../models/userReport.model");
 const UserTranscriptionService = require('../services/userTranscription.service');
-const UserTranscription = require('../models/userTranscription.model');
 const { Storage } = require('@google-cloud/storage');
 const { SpeechClient } = require('@google-cloud/speech');
 const fs = require('fs');
 const OpenAI = require("openai");
 
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffprobePath = require('@ffprobe-installer/ffprobe').path;
+const multer = require("multer");
+const upload = multer({ dest: 'uploads/' });
+const path = require('path');
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
+
 const storage = new Storage();
 const client = new SpeechClient();
 const bucketName = 'testbucket-hackathon';
-const localAudioPath = '/Users/ramis/Desktop/extrait.wav';
-const remoteFileName = 'extrait.wav';
 // Définir le chemin des informations d'identification
-const CREDENTIALS_PATH = "/Users/ramis/Desktop/single-being-427608-h9-336be855846f.json";
+const CREDENTIALS_PATH = "./config/google.json";
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
@@ -82,90 +88,159 @@ const askToGpt = async (req, res) => {
             .send("An error occurred while communicating with the OpenAI API");
     }
 }
+
 const generateTranscription = async (req, res) => {
+    console.log('Requête de transcription audio reçue :', req.file);
     const { userId } = req.params;
+    const localAudioPath = req.file.path;
+
+    const remoteFileName = path.basename(localAudioPath, path.extname(localAudioPath)) + '.wav';
+    const convertedAudioPath = path.join(__dirname, './../uploads', remoteFileName);
+    const localFilePath = path.join(__dirname, './../uploads', remoteFileName);
+    const fs = require('fs');
+    const fileData = fs.readFileSync(req.file.path);
+    fs.writeFile(localFilePath, fileData, (err) => {
+        if (err) throw err;
+        console.log('The file has been saved locally!');
+    })
+
+
+
+    console.log('Fichier audio reçu :', localAudioPath);
     try {
-        const gcsUri = await uploadFileToGCS(localAudioPath, remoteFileName);
-        const audio = {
-            uri: gcsUri,
-        };
-        const config = {
-            encoding: 'LINEAR16',
-            sampleRateHertz: 24000,
-            languageCode: 'fr-FR',
-            audioChannelCount: 2,
-            enableSeparateRecognitionPerChannel: true,
-            model: 'telephony',
-            diarizationConfig: {
-                enableSpeakerDiarization: true,
-                minSpeakerCount: 2,
-            },
-        };
-        const request = {
-            config: config,
-            audio: audio,
-        };
-        const [operation] = await client.longRunningRecognize(request);
-        const [response] = await operation.promise();
-        const transcription = response.results.map(result => ({
-            person: result.channelTag || 'Unknown',
-            text: result.alternatives[0].transcript || 'No transcription available',
-        }));
-        const transcriptionText = transcription.map(t => `Speaker ${t.person}: ${t.text}`).join('\n');
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                {
-                    "role": "system",
-                    "content": `Résumé la transcription suivante.`
-                },
-                {
-                    "role": "user",
-                    "content": transcriptionText
-                }
-            ]
+        // Convertir l'audio en WAV
+        await new Promise((resolve, reject) => {
+            ffmpeg(localAudioPath)
+                .toFormat('wav')
+                .on('end', resolve)
+                .on('error', reject)
+                .save(convertedAudioPath);
         });
-        const summary = completion.choices[0].message.content;
-        const data = ({
-            sequences: transcription,
-            resume: summary
-        })
-        if (transcription && summary) {
-            const userTranscriptionService = new UserTranscriptionService();
-            await userTranscriptionService.add(userId, data);
-        }
-        const gptResponse = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                {
-                    "role": "system",
-                    "content": `Si tu trouve des information pertinente je veux que tu analyse ce résumé de la transcription d'un appele et que tu me ressorts lors de la réponse le type de rapport parmi uniquement ces 5 types de rapports (possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark). La réponse sera le texte donné au patient par le chatbot. Et le rapport sera une phrase courte pour identifier le problème du patient (exemple : Coupure, Rhume, Intoxication alimentaire externe, etc...) et au format : {"typeOfReport": "(possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark)", "report": "REPORT", "response": "CONTENT"}`
+
+        const gcsUri = await uploadFileToGCS(convertedAudioPath, remoteFileName);
+
+        console.log('Fichier audio uploadé sur GCS :', gcsUri);
+
+        // Extraire les informations du fichier WAV converti
+        ffmpeg.ffprobe(convertedAudioPath, async (err, metadata) => {
+            if (err) {
+                console.error('Erreur lors de la lecture des métadonnées du fichier audio :', err);
+                return res.status(500).send('Erreur lors de la lecture des métadonnées du fichier audio');
+            }
+
+            const audio = {
+                uri: gcsUri,
+            };
+
+            const config = {
+                encoding: 'LINEAR16',
+                sampleRateHertz: metadata.streams[0].sample_rate,
+                languageCode: 'fr-FR',
+                audioChannelCount: metadata.streams[0].channels,
+                enableSeparateRecognitionPerChannel: true,
+                diarizationConfig: {
+                    enableSpeakerDiarization: true,
+                    minSpeakerCount: 2,
                 },
-                {
-                    "role": "user",
-                    "content": summary
+            };
+
+            const request = {
+                config: config,
+                audio: audio,
+            };
+
+            try {
+                const [operation] = await client.longRunningRecognize(request);
+                const [response] = await operation.promise();
+
+                console.log('Transcription terminée :', response.results);
+                const transcription = response.results.map(result => ({
+                    person: result.channelTag || 'Unknown',
+                    text: result.alternatives[0].transcript || 'No transcription available',
+                }));
+
+                const transcriptionText = transcription.map(t => `Speaker ${t.person}: ${t.text}`).join('\n');
+
+                const completion = await openai.chat.completions.create({
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        {
+                            "role": "system",
+                            "content": `Considère que tu es un praticien qui a passé un appel téléphonique et qui a reçu la transcription de l'appel. Tu dois maintenant résumer la transcription de l'appel en quelques phrases pour garder une trace de l'appel`
+                        },
+                        {
+                            "role": "user",
+                            "content": transcriptionText
+                        }
+                    ]
+                });
+
+                const summary = completion.choices[0].message.content;
+                let data = {
+                    sequences: transcription,
+                    resume: summary,
+                };
+                
+                if (transcription && summary) {
+                    const userTranscriptionService = new UserTranscriptionService();
+                    const uploadedData = await userTranscriptionService.add(userId, data, remoteFileName);
+                    data = {
+                        text: {
+                            sequences: transcription,
+                            resume: summary,
+                        },
+                        id: uploadedData.id,
+                        fileName: uploadedData.fileName,
+                        createdAt: uploadedData.createdAt,
+
+                    }
+
+
                 }
-            ]
+
+                const gptResponse = await openai.chat.completions.create({
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        {
+                            "role": "system",
+                            "content": `Si tu trouve des informations pertinentes je veux que tu analyse ce résumé de la transcription d'un appele et que tu me ressortes lors de la réponse le type de rapport parmi uniquement ces 5 types de rapports (possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark). La réponse sera le texte donné au patient par le chatbot. Et le rapport sera une phrase courte pour identifier le problème du patient (exemple : Coupure, Rhume, Intoxication alimentaire externe, etc...) et au format : {"typeOfReport": "(possibleDiseases, discoveredDisease, medicalHistory, currentTreatment ou remark)", "report": "REPORT", "response": "CONTENT"}`
+                        },
+                        {
+                            "role": "user",
+                            "content": summary
+                        }
+                    ]
+                });
+                const responseContent = gptResponse.choices[0].message.content;
+                const parsedResponse = JSON.parse(responseContent);
+                if (parsedResponse.typeOfReport && parsedResponse.report) {
+                    const userService = new UserReportService();
+                    const userReport = await userService.add(userId, parsedResponse.typeOfReport, parsedResponse.report, true);
+                } else {
+                    res.status(400).send({ error: 'Invalid response format from ChatGPT' });
+                }
+                res.json(data);
+            } catch (error) {
+                console.error('Erreur lors de la transcription, :', error);
+                res.status(500).send('Erreur lors de la transcriptionnn');
+            } finally {
+
+            }
         });
-        const responseContent = gptResponse.choices[0].message.content;
-        const parsedResponse = JSON.parse(responseContent);
-        if (parsedResponse.typeOfReport && parsedResponse.report) {
-            const userService = new UserReportService();
-            const userReport = await userService.add(userId, parsedResponse.typeOfReport, parsedResponse.report, true);
-        } else {
-            res.status(400).send({ error: 'Invalid response format from ChatGPT' });
-        }
-        res.json(data);
     } catch (error) {
-        res.status(500).send('Erreur lors de la transcription');
+        console.error('Erreur lors de la conversion du fichier audio :', error);
+        res.status(500).send('Erreur lors de la conversion du fichier audio');
     }
 }
+
 const getRecords = async (req, res) => {
     const { userId } = req.params;
     const userTranscriptionService = new UserTranscriptionService();
     const data = await userTranscriptionService.getAll(userId);
+    console.log(JSON.stringify(data, null, 2));
     res.json(data);
 }
+
 async function uploadFileToGCS(localFilePath, remoteFileName) {
     try {
         await storage.bucket(bucketName).upload(localFilePath, {
@@ -177,6 +252,7 @@ async function uploadFileToGCS(localFilePath, remoteFileName) {
         throw err;
     }
 }
+
 module.exports = {
     getUsers,
     getUserReport,

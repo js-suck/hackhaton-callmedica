@@ -6,10 +6,11 @@ const OpenAIModule = require("../modules/openai.module"); //
 require("dotenv-flow").config();
 
 class UserTranscriptionService {
-    async add(userId, text) {
+    async add(userId, text, fileName) {
         const userTranscription = await UserTranscription.create({
             userId,
-            text
+            text,
+            fileName
         });
 
         if (!userTranscription) {

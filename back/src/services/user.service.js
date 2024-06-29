@@ -6,9 +6,28 @@ const OpenAI = require("openai");
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
+
+
+const mapUserList = (users) => {
+    return {
+        userInfo: {
+            id: { value: users.id, generatedByAI: false },
+            firstname: { value: users.firstname, generatedByAI: false },
+            lastname: { value: users.lastname, generatedByAI: false },
+            email: { value: users.email, generatedByAI: false },
+            location: { value: users.location, generatedByAI: false },
+            birthDate: { value: users.birthDate, generatedByAI: false },
+            currentAddress: { value: users.currentAddress, generatedByAI: false },
+
+        }
+    }
+
+}
+
 class UserService {
     static async getUsers() {
-        return await User.findAll();
+        const users = await User.findAll();
+        return users.map(mapUserList);
     }
 
     static async getUserReport(userId) {
@@ -108,7 +127,7 @@ class UserService {
         await updateReports("discoveredDisease", reportData.discoveredDisease);
         await updateReports("medicalHistory", reportData.medicalHistory);
         await updateReports("currentTreatment", reportData.currentTreatment);
-        await updateReports("remarks", reportData.remarks);
+        await updateReports("remark", reportData.remark);
 
         return { message: "User and reports updated successfully" };
     }
