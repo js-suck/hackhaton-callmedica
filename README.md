@@ -23,7 +23,7 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
   - **Auteur** : Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
 
 - **Upload de fichiers audio** : Mise en place de l'upload de fichiers audio pour les patients (pour la simuler des appels vocaux).
- - **Auteur** : Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
+  - **Auteur** : Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
 
 ## Équipe de Développement
 
@@ -183,4 +183,5 @@ const generateTranscription = async (req, res) => {
 - Vérifiez que la clé API OpenAI est valide et correctement configurée dans le fichier `.env`.
 
 Pour toute question ou problème, veuillez contacter l'un des développeurs de l'équipe.
+
 Numéro de la maman d'Antoine pour Baptiste : 01 48 10 31 00
