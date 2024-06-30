@@ -17,6 +17,10 @@ const UserTranscriptions = sequelize.define(
             type: DataTypes.JSON,
             allowNull: false,
         },
+        fileName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     },
     {
         freezeTableName: true,

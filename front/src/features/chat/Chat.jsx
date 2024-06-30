@@ -1,4 +1,4 @@
-import "regenerator-runtime/runtime"; // Ajoutez cette ligne en haut
+import "regenerator-runtime/runtime";
 import {
   Box,
   Fab,
@@ -11,7 +11,7 @@ import {
   MenuItem,
   CircularProgress,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -19,6 +19,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import {usePatientsData} from "../patients-table/hooks/usePatientsData";
 
 const preRecordedMessages = [
   "J'ai une coupure. Que dois-je faire ?",
@@ -28,12 +29,15 @@ const preRecordedMessages = [
   "Que faire en cas de brûlure mineure ?",
 ];
 
-const Chat = ({ userId }) => {
+const Chat = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
+  const {selectedPatient} = usePatientsData();
+  console.log(selectedPatient);
+  const userId = selectedPatient?.userInfo?.id.value || 1;
 
   const {
     transcript,
@@ -42,9 +46,16 @@ const Chat = ({ userId }) => {
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
+
+  useEffect(() => {
+    console.log(selectedPatient);
+    setOpen(!!selectedPatient);
+  }, [selectedPatient]);
+
   if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
+
 
   const handleClickOpen = () => {
     setOpen(!open);
@@ -63,7 +74,7 @@ const Chat = ({ userId }) => {
 
       try {
         const response = await fetch(
-          `http://localhost:3002/api/${userId}/ask`,
+          `http://localhost:3002/api/user/${userId}/ask`,
           {
             method: "POST",
             headers: {
@@ -153,7 +164,7 @@ const Chat = ({ userId }) => {
             }}
           >
             <Typography variant="h6" color="black">
-              Chat
+              Chat with {selectedPatient?.userInfo?.firstname?.value || "Patient"}
             </Typography>
             <IconButton onClick={handleClose}>
               <CloseIcon />

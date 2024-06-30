@@ -2,6 +2,7 @@ const db = require("./db/sequelize");
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const path = require('path');
 const User = require("./models/user.model");
 const UserReportService = require("./services/userReport.service");
 const UserReport = require("./models/userReport.model");
@@ -26,4 +27,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
+app.use('/files', express.static(path.join(__dirname, './uploads')));
 module.exports = app;
+

@@ -10,10 +10,17 @@ export const theme = createTheme({
         },
         text: {
             primary: '#333333',
+            secondary: '#666666'
         },
         background: {
-            default: '#ffffff',
+            default: '#fffafa',
         },
+        black: {
+            main: '#1f2322'
+        },
+        orange : {
+            light: '#e88663',
+        }
     },
     typography: {
         fontFamily: 'Open Sans, sans-serif',

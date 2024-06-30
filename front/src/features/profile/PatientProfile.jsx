@@ -1,125 +1,128 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Container, Typography, List, ListItem, ListItemText, Chip } from '@mui/material';
+import { Typography, List, Box, Avatar, Modal } from '@mui/material';
+import { ProfileItem } from "./ProfileItem";
+import { usePatientsData } from "../patients-table/hooks/usePatientsData";
 
-export const PatientProfile = ({ data }) => {
-    const renderSource = (source) => {
-        const color = source === "AI" ? "primary" : "secondary";
-        return <Chip label={source} color={color} size="small" />;
-    };
+export const PatientProfile = () => {
+    const { selectedPatient: patient, isModalOpen, handleClose } = usePatientsData();
+
+    if (!patient) {
+        return null;
+    }
+
 
     return (
-        <Container>
-            <Typography variant="h1">Patient Profile</Typography>
-            <Typography variant="h2">User Information</Typography>
-            <List>
-                <ListItem>
-                    <ListItemText
-                        primary="First Name"
-                        secondary={
-                            <>
-                                {data.userInfo.firstName.value} {renderSource(data.userInfo.firstName.source)}
-                            </>
-                        }
-                    />
-                </ListItem>
-                <ListItem>
-                    <ListItemText
-                        primary="Last Name"
-                        secondary={
-                            <>
-                                {data.userInfo.lastName.value} {renderSource(data.userInfo.lastName.source)}
-                            </>
-                        }
-                    />
-                </ListItem>
-                <ListItem>
-                    <ListItemText
-                        primary="Email"
-                        secondary={
-                            <>
-                                {data.userInfo.email.value} {renderSource(data.userInfo.email.source)}
-                            </>
-                        }
-                    />
-                </ListItem>
-                <ListItem>
-                    <ListItemText
-                        primary="Location"
-                        secondary={
-                            <>
-                                {data.userInfo.location.value} {renderSource(data.userInfo.location.source)}
-                            </>
-                        }
-                    />
-                </ListItem>
-                <ListItem>
-                    <ListItemText
-                        primary="Birth Date"
-                        secondary={
-                            <>
-                                {data.userInfo.birthDate.value} {renderSource(data.userInfo.birthDate.source)}
-                            </>
-                        }
-                    />
-                </ListItem>
-                <ListItem>
-                    <ListItemText
-                        primary="Current Address"
-                        secondary={
-                            <>
-                                {data.userInfo.currentAddress.value} {renderSource(data.userInfo.currentAddress.source)}
-                            </>
-                        }
-                    />
-                </ListItem>
-            </List>
-            <Typography variant="h2">Possible Diseases</Typography>
-            <List>
-                {data.possibleDiseases.map((disease, index) => (
-                    <ListItem key={index}>
-                        <ListItemText
-                            primary={disease.value}
-                            secondary={renderSource(disease.source)}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-            <Typography variant="h2">Discovered Disease</Typography>
-            <Typography variant="body1">
-                {data.discoveredDisease.value} {renderSource(data.discoveredDisease.source)}
-            </Typography>
-            <Typography variant="h2">Medical History</Typography>
-            <List>
-                {data.medicalHistory.map((history, index) => (
-                    <ListItem key={index}>
-                        <ListItemText
-                            primary={history.value}
-                            secondary={renderSource(history.source)}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-            <Typography variant="h2">Current Treatment</Typography>
-            <List>
-                {data.currentTreatment.map((treatment, index) => (
-                    <ListItem key={index}>
-                        <ListItemText
-                            primary={`${treatment.name} - ${treatment.dosage} - ${treatment.frequency}`}
-                            secondary={renderSource(treatment.source)}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-            <Typography variant="h2">Remarks</Typography>
-            <Typography variant="body1">
-                {data.remarks.value} {renderSource(data.remarks.source)}
-            </Typography>
-        </Container>
+        <Modal open={isModalOpen} aria-labelledby="patient-details-title" aria-describedby="patient-details-description" onClose={handleClose}>
+            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" minWidth={"800px"} textAlign="center" padding={"2%"} borderRadius={"3em"} boxShadow={3} sx={{
+                backgroundColor: "white",
+                maxWidth: "80%",
+                maxHeight: "80%",
+                overflowY: 'auto',
+                margin: "auto",
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+            }}>
+                <Avatar alt="Profile Picture" src={`https://i.pravatar.cc/400?u=${patient.userInfo.id.value}`} sx={{
+                    width: "200px",
+                    height: "200px",
+                    margin: "auto",
+                    marginBottom: "16px"
+                }} />
+                <Typography variant="h1" color={"primary"} margin={'auto'} mb={"8px"}>
+                    {patient.userInfo.firstname.value} {patient.userInfo.lastname.value}
+                </Typography>
+                <Box width="100%" maxWidth="600px">
+                    <List>
+                        <ProfileItem property={patient.userInfo.firstname} label="First Name" path="userInfo.firstname" />
+                        <ProfileItem property={patient.userInfo.lastname} label="Last Name" path="userInfo.lastname" />
+                        <ProfileItem property={patient.userInfo.email} label="Email" path="userInfo.email" />
+                        <ProfileItem property={patient.userInfo.location} label="Location" path="userInfo.location" />
+                        <ProfileItem property={patient.userInfo.birthDate} label="Birth Date" path="userInfo.birthDate" />
+                        <ProfileItem property={patient.userInfo.currentAddress} label="Current Address" path="userInfo.currentAddress" />
+                    </List>
+                </Box>
+
+                {patient.possibleDiseases?.length > 0 && (
+                    <>
+                        <Typography variant="h2">Maladie possible</Typography>
+                        <Box width="100%" maxWidth="600px">
+                            <List>
+                                {patient.possibleDiseases?.map((disease, index) => (
+                                    <ProfileItem key={index} property={disease} label="Possible Disease" path={`possibleDiseases.${index}`} />
+                                ))}
+                            </List>
+                        </Box>
+                    </>
+                )}
+
+                {patient.discoveredDisease?.length > 0 && (
+                    <>
+                        <Typography variant="h2">Discovered Disease</Typography>
+                        <Box width="100%" maxWidth="600px" mb={"16px"}>
+                            {
+                                patient.discoveredDisease.map((disease, index) => (
+                                    <ProfileItem key={index} property={disease} label="Discovered Disease" path={`discoveredDisease.${index}`} />
+                                ))
+                            }
+                        </Box>
+                    </>
+                )}
+
+                {patient.medicalHistory?.length > 0 && (
+                    <>
+                        <Typography variant="h2">Historique médical</Typography>
+                        <Box width="100%" maxWidth="600px">
+                            <List>
+                                {patient.medicalHistory.map((history, index) => (
+                                    <ProfileItem key={index} property={history} label="Medical History" path={`medicalHistory.${index}`} />
+                                ))}
+                            </List>
+                        </Box>
+                    </>
+                )}
+
+                {patient.currentTreatment?.length > 0 && (
+                    <>
+                        <Typography variant="h2">Traitement actuel</Typography>
+                        <Box width="100%" maxWidth="600px">
+                            <List>
+                                {patient.currentTreatment.map((treatment, index) => (
+                                    <ProfileItem key={index} property={treatment} label="Current Treatment" path={`currentTreatment.${index}`} />
+                                ))}
+                            </List>
+                        </Box>
+                    </>
+                )}
+
+                {patient.remark?.length > 0 && (
+                    <>
+                        <Typography variant="h2">Remarques</Typography>
+                        {patient.remark.map((remark, index) => (
+                            <Box width="100%" maxWidth="600px" mb={"16px"}>
+
+                            <ProfileItem key={index} property={remark} label="Remarks" path={`remark.${index}`} />
+                        </Box>
+                        ))
+}
+
+                    </>
+                )}
+
+                <Typography variant="h2">Resumé</Typography>
+                <Box width="100%" maxWidth="600px" mb={"16px"}>
+                    <ProfileItem property={patient?.resume} label="Remarks" path="remarks" />
+                </Box>
+            </Box>
+        </Modal>
     );
 };
 
 PatientProfile.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleClose: PropTypes.func.isRequired,
     data: PropTypes.shape({
         userInfo: PropTypes.shape({
             firstName: PropTypes.shape({
