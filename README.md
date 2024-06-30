@@ -25,9 +25,6 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 - **Upload de fichiers audio** : Mise en place de l'upload de fichiers audio pour les patients (pour la simuler des appels vocaux).
  - **Auteur** : Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
 
-
-  - **Auteur** : [Nom et Pseudo du Développeur]
-
 ## Équipe de Développement
 
 ### Groupe 20
