@@ -3,9 +3,9 @@ import { AppBar, Toolbar, IconButton, ThemeProvider, CssBaseline, Container } fr
 import {theme} from "./theme/theme.js";
 import logo from "./assets/logo.png"
 import {PatientDataProvider} from "./features/patients-table/hooks/usePatientsData.tsx";
-import {PatientsTable} from "./features/patients-table/PatiensTable.jsx";
+import {PatientsTable} from "./features/patients-table/PatiensTable.js";
 import {PatientRecordsDataProvider} from "./features/patients-records/hooks/usePatientRecords.tsx";
-import Chat from "./features/chat/Chat.jsx";
+import Chat from "./features/chat/Chat.tsx";
 
 
 function App() {

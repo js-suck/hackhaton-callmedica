@@ -1,15 +1,51 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, Dispatch, SetStateAction, useContext, useEffect, useState} from "react";
 import { setPropertyByPath } from "./../../../helpers/json.js";
 
+
+
+export type TProperty = {
+    value: string;
+    generatedByAI?: boolean;
+}
+
+interface TPatientData {
+    userInfo: {
+        id: TProperty;
+        lastname: TProperty;
+        firstname: TProperty;
+        email: TProperty;
+        location: TProperty;
+        birthDate: TProperty;
+        currentAddress: TProperty;
+    };
+    possibleDiseases: TProperty[];
+    discoveredDisease: TProperty[];
+    medicalHistory: TProperty[];
+    currentTreatment: TProperty[];
+    remark: TProperty;
+    resume: TProperty;
+}
+
+interface PatientDataContextValue {
+    patientsData: TPatientData[];
+    setPatientsData: Dispatch<SetStateAction<TPatientData[]>>;
+    setInfoProperty: (id: string, path: string, value: any) => void;
+    isEditing: boolean;
+    setIsEditingMode: Dispatch<SetStateAction<boolean>>;
+    isModalOpen: boolean;
+    handleOpen: (patient: TPatientData) => Promise<void>;
+    handleClose: () => Promise<void>;
+    selectedPatient: TPatientData | null;
+    selectPatient: (patient: TPatientData) => void;
+}
 
 const PatientDataContext = createContext();
 
 
-const fetchPatientData = async (id) => {
+const fetchPatientData = async (id: string): Promise<TPatientData> => {
     try {
         const response = await fetch(`http://localhost:3002/api/user/${id}/user-report`);
         const data = await response.json();
-        console.log("Data fetched:", data);
         return data;
     } catch (error) {
         console.error("Error fetching patients data:", error);
@@ -19,11 +55,10 @@ const fetchPatientData = async (id) => {
 }
 
 
-const fetchPatientsData = async () => {
+const fetchPatientsData = async (): Promise<TPatientData[]> => {
     try {
         const response = await fetch("http://localhost:3002/api/user");
         const data = await response.json();
-        console.log("Data fetched:", data);
         return data;
     } catch (error) {
         console.error("Error fetching patients data:", error);
@@ -33,7 +68,7 @@ const fetchPatientsData = async () => {
 }
 
 
-const updatePatientData = async (id, data) => {
+const updatePatientData = async (id: string, data: TPatientData): Promise<TPatientData | null> => {
     try {
         const response = await fetch(`http://localhost:3002/api/user/${id}/user-report`, {
             method: "PUT",
@@ -43,7 +78,6 @@ const updatePatientData = async (id, data) => {
             body: JSON.stringify(data)
         });
         const updatedData = await response.json();
-        console.log("Data updated:", updatedData);
         return updatedData;
     } catch (error) {
         console.error("Error updating patient data:", error);
@@ -52,26 +86,8 @@ const updatePatientData = async (id, data) => {
 
 }
 
-const mapPatientData = (data) => {
-    console.log("Mapping patient data:", data);
-        return {
-            id: data.userInfo.id,
-            ...data
-        }
-}
-
-
-const mapPatientDataToTableData = (data) => {
-    console.log("Mapping patient data:", data);
-    return {
-        id: data.userInfo.id,
-        lastname: data.userInfo.lastname,
-        firstname: data.userInfo.firstname,
-        email: data.userInfo.email
-    }
-}
-export const PatientDataProvider = ({ children }) => {
-    const [patientsData, setPatientsData] = useState([]);
+export const PatientDataProvider = ({ children }: { children: React.ReactNode }) => {
+    const [patientsData, setPatientsData] = useState<TPatientData[]>([]);
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
@@ -81,7 +97,6 @@ export const PatientDataProvider = ({ children }) => {
         const fetchData = async () => {
             const data = await fetchPatientsData();
             setPatientsData(data);
-            console.log("Patients data ici:", patientsData);
             await fetchAndSetPatientData(data?.[0]);
 
         };
@@ -92,53 +107,43 @@ export const PatientDataProvider = ({ children }) => {
 
     }, []);
 
-    const fetchAndSetPatientData = async (patient) => {
-        console.log("Fetching patient data for:", patient);
+    const fetchAndSetPatientData = async (patient: TPatientData) => {
         const patientData = await fetchPatientData(patient.userInfo.id.value);
-        console.log("Patient data:", patientData, "test", patientData[0]);
         setSelectedPatient(patientData);
         setPatientData(patient.userInfo.id.value, patientData);
     }
 
 
-    const handleOpen = async (patient) => {
-        console.log("Opening modal for patient:", patient);
+    const handleOpen = async (patient: TPatientData) => {
         await fetchAndSetPatientData(patient);
         setIsModalOpen(true);
     };
 
-    const selectPatient = (patient) => {
-        console.log("Selected patient:", patient);
+    const selectPatient = (patient: TPatientData) => {
         setSelectedPatient(patient);
     }
 
     const handleClose = async () => {
         setIsModalOpen(false);
         const data = await fetchPatientsData();
-        console.log("Fetched data:", data)
         setPatientsData(data);
     };
 
-    const setPatientData = (id, data) => {
-        console.log("Setting patient data:", data);
+    const setPatientData = (id: string, data: TPatientData): void => {
         setPatientsData(prevData => {
             const updatedPatients = [...prevData];
             const patientIndex = updatedPatients.findIndex(patient => patient.userInfo.id.value === id);
             if (patientIndex !== -1) {
                 updatedPatients[patientIndex] = data;
             }
-            console.log("Updated patients data:", updatedPatients);
             return updatedPatients;
         });
     }
 
-    const setInfoProperty = (id, path, value, infoId) => {
-        console.log("Setting property", path, "to", value, patientsData);
+    const setInfoProperty = (id : string, path: string, value: any) => {
         setPatientsData(prevData => {
             const updatedPatients = [...prevData];
-            console.log("Updated patients:", updatedPatients, "ID:", id);
             const patientIndex = updatedPatients.findIndex(patient => patient?.userInfo?.id.value === id);
-            console.log("Patient index:", patientIndex);
             if (patientIndex !== -1) {
                 updatedPatients[patientIndex] = setPropertyByPath({ ...updatedPatients[patientIndex] }, path, value)
             }
@@ -147,15 +152,14 @@ export const PatientDataProvider = ({ children }) => {
 
         savePatientData(id, patientsData.find(patient => patient?.userInfo?.id.value === id));
 
-        console.log("Updated patients data:", patientsData);
     };
 
-    const setIsEditingMode = (value) => {
+    const setIsEditingMode = (value: boolean | ((prevState: boolean) => boolean)) => {
         setIsEditing(value);
     };
 
 
-    const savePatientData = async (id, data) =>  updatePatientData(id, data);
+    const savePatientData = async (id: string, data: TPatientData) =>  updatePatientData(id, data);
 
 
     return (
@@ -165,4 +169,4 @@ export const PatientDataProvider = ({ children }) => {
     );
 }
 
-export const usePatientsData = () => useContext(PatientDataContext);
+export const usePatientsData = (): PatientDataContextValue => useContext(PatientDataContext) as PatientDataContextValue;

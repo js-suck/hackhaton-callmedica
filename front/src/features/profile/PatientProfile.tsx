@@ -1,16 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Typography, List, Box, Avatar, Modal } from '@mui/material';
 import { ProfileItem } from "./ProfileItem";
 import { usePatientsData } from "../patients-table/hooks/usePatientsData";
 
-export const PatientProfile = () => {
+const PatientProfile: React.FC = () => {
     const { selectedPatient: patient, isModalOpen, handleClose } = usePatientsData();
 
     if (!patient) {
         return null;
     }
-
 
     return (
         <Modal open={isModalOpen} aria-labelledby="patient-details-title" aria-describedby="patient-details-description" onClose={handleClose}>
@@ -47,7 +45,7 @@ export const PatientProfile = () => {
 
                 {patient.possibleDiseases?.length > 0 && (
                     <>
-                        <Typography variant="h2">Maladie possible</Typography>
+                        <Typography variant="h2">Possible Diseases</Typography>
                         <Box width="100%" maxWidth="600px">
                             <List>
                                 {patient.possibleDiseases?.map((disease, index) => (
@@ -60,20 +58,18 @@ export const PatientProfile = () => {
 
                 {patient.discoveredDisease?.length > 0 && (
                     <>
-                        <Typography variant="h2">Discovered Disease</Typography>
+                        <Typography variant="h2">Discovered Diseases</Typography>
                         <Box width="100%" maxWidth="600px" mb={"16px"}>
-                            {
-                                patient.discoveredDisease.map((disease, index) => (
-                                    <ProfileItem key={index} property={disease} label="Discovered Disease" path={`discoveredDisease.${index}`} />
-                                ))
-                            }
+                            {patient.discoveredDisease.map((disease, index) => (
+                                <ProfileItem key={index} property={disease} label="Discovered Disease" path={`discoveredDisease.${index}`} />
+                            ))}
                         </Box>
                     </>
                 )}
 
                 {patient.medicalHistory?.length > 0 && (
                     <>
-                        <Typography variant="h2">Historique médical</Typography>
+                        <Typography variant="h2">Medical History</Typography>
                         <Box width="100%" maxWidth="600px">
                             <List>
                                 {patient.medicalHistory.map((history, index) => (
@@ -86,7 +82,7 @@ export const PatientProfile = () => {
 
                 {patient.currentTreatment?.length > 0 && (
                     <>
-                        <Typography variant="h2">Traitement actuel</Typography>
+                        <Typography variant="h2">Current Treatment</Typography>
                         <Box width="100%" maxWidth="600px">
                             <List>
                                 {patient.currentTreatment.map((treatment, index) => (
@@ -99,86 +95,22 @@ export const PatientProfile = () => {
 
                 {patient.remark?.length > 0 && (
                     <>
-                        <Typography variant="h2">Remarques</Typography>
+                        <Typography variant="h2">Remarks</Typography>
                         {patient.remark.map((remark, index) => (
-                            <Box width="100%" maxWidth="600px" mb={"16px"}>
-
-                            <ProfileItem key={index} property={remark} label="Remarks" path={`remark.${index}`} />
-                        </Box>
-                        ))
-}
-
+                            <Box width="100%" maxWidth="600px" mb={"16px"} key={index}>
+                                <ProfileItem property={remark} label="Remarks" path={`remark.${index}`} />
+                            </Box>
+                        ))}
                     </>
                 )}
 
-                <Typography variant="h2">Resumé</Typography>
+                <Typography variant="h2">Résumé</Typography>
                 <Box width="100%" maxWidth="600px" mb={"16px"}>
-                    <ProfileItem property={patient?.resume} label="Remarks" path="remarks" />
+                    <ProfileItem property={patient.resume} label="Résumé" path="resume" />
                 </Box>
             </Box>
         </Modal>
     );
-};
-
-PatientProfile.propTypes = {
-    open: PropTypes.bool.isRequired,
-    handleClose: PropTypes.func.isRequired,
-    data: PropTypes.shape({
-        userInfo: PropTypes.shape({
-            firstName: PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            }).isRequired,
-            lastName: PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            }).isRequired,
-            email: PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            }).isRequired,
-            location: PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            }).isRequired,
-            birthDate: PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            }).isRequired,
-            currentAddress: PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            }).isRequired,
-        }).isRequired,
-        possibleDiseases: PropTypes.arrayOf(
-            PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            })
-        ).isRequired,
-        discoveredDisease: PropTypes.shape({
-            value: PropTypes.string.isRequired,
-            source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-        }).isRequired,
-        medicalHistory: PropTypes.arrayOf(
-            PropTypes.shape({
-                value: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            })
-        ).isRequired,
-        currentTreatment: PropTypes.arrayOf(
-            PropTypes.shape({
-                name: PropTypes.string.isRequired,
-                dosage: PropTypes.string.isRequired,
-                frequency: PropTypes.string.isRequired,
-                source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-            })
-        ).isRequired,
-        remarks: PropTypes.shape({
-            value: PropTypes.string.isRequired,
-            source: PropTypes.oneOf(['practitioner', 'AI']).isRequired,
-        }).isRequired,
-    }).isRequired,
 };
 
 export default PatientProfile;

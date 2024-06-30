@@ -1,18 +1,15 @@
 import * as React from "react";
 import { Chip, Input, ListItem, ListItemText, IconButton } from "@mui/material";
 import { Check, Edit } from "@mui/icons-material";
-import { usePatientsData } from "../patients-table/hooks/usePatientsData";
+import {TProperty, usePatientsData} from "../patients-table/hooks/usePatientsData";
 
-type ProfileItemProps = {
-    property: {
-        value: string;
-        source: string;
-    };
+type TProfileItemProps = {
+    property: TProperty
     label: string;
     path: string;
 }
 
-export const ProfileItem: React.FC<ProfileItemProps> = ({ property, label, path }) => {
+export const ProfileItem: React.FC<TProfileItemProps> = ({ property, label, path }) => {
     const [editMode, setEditMode] = React.useState(false);
     const { selectedPatient, setInfoProperty } = usePatientsData();
     const [editProperty, setEditProperty] = React.useState(property);
@@ -30,7 +27,6 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({ property, label, path 
 
     const onSave = (value: string) => {
         if (selectedPatient) {
-            console.log(selectedPatient.id, path, value);
             setInfoProperty(selectedPatient.userInfo.id.value, path, value)
         }
         setEditMode(false);
@@ -69,7 +65,7 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({ property, label, path 
     );
 };
 
-const EditItem: React.FC<ProfileItemProps & { setEditMode: (value: boolean) => void, setEditInfo: (property: { value: string, source: string }) => void }> = ({ property, label, onChange, onSave, setEditMode, setEditInfo }) => {
+const EditItem: React.FC<TProfileItemProps & { setEditMode: (value: boolean) => void, setEditInfo: (property: TProperty) => void }> = ({ property, label, onChange, onSave, setEditMode, setEditInfo }) => {
     const listItemRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {

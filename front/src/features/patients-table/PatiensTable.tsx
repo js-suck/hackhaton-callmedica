@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import { usePatientsData } from "./hooks/usePatientsData";
-import PatientProfile from "../profile/PatientProfile.jsx";
+import PatientProfile from "../profile/PatientProfile.tsx";
 import {Phone, RemoveRedEye, Visibility} from "@mui/icons-material";
 import {PatientRecordsModal} from "../patients-records/PatientRecordsModal";
 import {usePatientRecordsData} from "../patients-records/hooks/usePatientRecords";
@@ -30,18 +30,15 @@ export const PatientsTable = () => {
     };
 
     const handleOpenFiche = (patient) => {
-        console.log("patient", patient)
         handleOpen(patient);
         handleClose();
     };
 
     const handleOpenCall = (patient) => {
-        console.log("patient", patient)
         setIsRecordsModalOpen(true);
         handleClose();
     }
 
-    console.log("patientsData", patientsData, selectedPatient, "isRecordsModalOpen", isRecordsModalOpen)
     if (patientsData.length === 0){
         return <CircularProgress />
     }

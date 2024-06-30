@@ -36,7 +36,6 @@ const Chat = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
   const {selectedPatient} = usePatientsData();
-  console.log(selectedPatient);
   const userId = selectedPatient?.userInfo?.id.value || 1;
 
   const {
@@ -48,7 +47,6 @@ const Chat = () => {
 
 
   useEffect(() => {
-    console.log(selectedPatient);
     setOpen(!!selectedPatient);
   }, [selectedPatient]);
 

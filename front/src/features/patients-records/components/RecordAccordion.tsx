@@ -5,10 +5,9 @@ import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-import {Box, useTheme} from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { usePatientRecordsData } from "../hooks/usePatientRecords";
 import AudioPlayer from "./AudioPlayer";
-import audio from "./../audio/audio2.wav";
 
 const Accordion = styled((props) => (
     <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -49,18 +48,18 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
     overflowY: 'auto'
 }));
 
-export default function RecordsAccordion() {
-    const [expanded, setExpanded] = useState(false);
+export const RecordsAccordion: React.FC = () => {
+    const [expanded, setExpanded] = useState<string | false>(false);
     const { patientRecords } = usePatientRecordsData();
-    const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(null);
+    const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState<number | null>(null);
     const theme = useTheme();
 
-    const handleChange = (panel) => (event, newExpanded) => {
+    const handleChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
         setExpanded(newExpanded ? panel : false);
         setCurrentTranscriptIndex(null);
     };
 
-    const handleTranscriptClick = (index) => {
+    const handleTranscriptClick = (index: number) => {
         setCurrentTranscriptIndex(index);
     };
 
@@ -73,49 +72,52 @@ export default function RecordsAccordion() {
                     onChange={handleChange(`panel${record.id}`)}
                 >
                     <AccordionSummary aria-controls={`panel${record.id}d-content`} id={`panel${record.id}d-header`}>
-                        <Typography fontWeight="bold">  Enregistrement du {new Date(record?.createdAt).toLocaleString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        <Typography fontWeight="bold">
+                            Enregistrement du {new Date(record?.createdAt).toLocaleString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <AudioPlayer audioUrl={"http://localhost:3002/files/" + record.fileName} />
-                        <Box sx={{ mt: 2, mb: 2, border: `1px solid ${theme.palette.primary.main}` , bgcolor: 'background.paper', borderRadius: 4, p: 2 }}>
+                        <AudioPlayer audioUrl={`http://localhost:3002/files/${record.fileName}`} />
+                        <Box sx={{ mt: 2, mb: 2, border: `1px solid ${theme.palette.primary.main}`, bgcolor: 'background.paper', borderRadius: 4, p: 2 }}>
                             <Typography variant="h6" gutterBottom>
                                 Résumé
                             </Typography>
-                            <Typography variant="subtitle1" gutterBottom sx={{ marginBottom: '20px'}}>
+                            <Typography variant="subtitle1" gutterBottom sx={{ marginBottom: '20px' }}>
                                 {record.text.resume}
                             </Typography>
                         </Box>
                         <Box sx={{ mb: 2 }}>
-                            <Typography variant="h6" gutterBottom sx={{ marginBottom: '10px'}}>
+                            <Typography variant="h6" gutterBottom sx={{ marginBottom: '10px' }}>
                                 Transcription
                             </Typography>
 
-                        {record.text?.sequences?.map((sequence, seqIndex) => (
-                            <Box
-                                key={seqIndex}
-                                mb={1}
-                                onClick={() => handleTranscriptClick(seqIndex)}
-                                sx={{
-                                    backgroundColor: currentTranscriptIndex === seqIndex ? '#FFECB3' : 'transparent',  // Orange light color
-                                    cursor: 'pointer',
-                                    borderRadius: 4,
-                                    padding: 1,
-                                    borderBottom: `1px solid ${theme.palette.divider}`
-                                }}
-                            >
-                                <Typography variant="body2" color="textSecondary">
-                                    Speaker: {sequence.person}
-                                </Typography>
-                                <Typography variant="body1">
-                                    {sequence.text}
-                                </Typography>
-                            </Box>
-                        ))}
+                            {record.text?.sequences?.map((sequence, seqIndex) => (
+                                <Box
+                                    key={seqIndex}
+                                    mb={1}
+                                    onClick={() => handleTranscriptClick(seqIndex)}
+                                    sx={{
+                                        backgroundColor: currentTranscriptIndex === seqIndex ? '#FFECB3' : 'transparent',
+                                        cursor: 'pointer',
+                                        borderRadius: 4,
+                                        padding: 1,
+                                        borderBottom: `1px solid ${theme.palette.divider}`
+                                    }}
+                                >
+                                    <Typography variant="body2" color="textSecondary">
+                                        Speaker: {sequence.person}
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {sequence.text}
+                                    </Typography>
+                                </Box>
+                            ))}
                         </Box>
                     </AccordionDetails>
                 </Accordion>
             ))}
         </Box>
     );
-}
+};
+
+export default RecordsAccordion;
