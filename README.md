@@ -10,16 +10,22 @@ Découvrez notre solution SaaS révolutionnaire pour les soins de santé. Nous a
 - **Chatbot IA** : Intégration d'un chatbot utilisant l'API OpenAI pour fournir des conseils de premiers secours et des informations médicales de base avec reconnaissance vocale.
   - **Auteur** : Antoine Chabernaud 5IW2 / [senex127](https://github.com/senex127) 
 
-- **Gestion des fiches patient** : Création, modification et récupération des fiches patient avec gestion des différents types (Historiques médical, traitements, maladies possibles, etc.) ainsi que la récupération des patients enregistrés.
-  - **Auteur** : Vivian Ruhlmann 5IW2 / [Loviflo](https://github.com/Loviflo)
+- **Gestion des fiches patient** : Création, modification et récupération des fiches patient pré-remplis via l'IA avec gestion des différents types (Historiques médical, traitements, maladies possibles, etc.) ainsi que la récupération des patients enregistrés basé sur les données du patient et de l'IA.
+  - **Auteur** : back: Vivian Ruhlmann 5IW2 / [Loviflo](https://github.com/Loviflo) | front: Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
 
 - **Messages Préenregistrés** : Ajout d'un menu déroulant de messages préenregistrés pour aider les utilisateurs à poser rapidement des questions courantes.
   - **Auteur** : Antoine Chabernaud 5IW2 / [senex127](https://github.com/senex127) 
 
 - **Intégration Speech to Text** : Mise en place de la configuration du service Speech to Text de Google Cloud et enregistrement des conversations utilisateurs dans notre base de données.
-  - **Auteur** : Lucas Ramis 5IW2 / [RamisL](https://github.com/RamisL)
+  - **Auteur** : back: Lucas Ramis 5IW2 / [RamisL](https://github.com/RamisL) 
 
-- **Interface Utilisateur** : Conception de l'interface utilisateur en React, incluant des boutons, des icônes et des éléments de formulaire pour améliorer l'expérience utilisateur.
+- **Intégration d'un player audio** : Mise en place d'un player audio pour écouter les messages vocaux des patients, avec intégration de la transcription automatique.
+  - **Auteur** : Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
+
+- **Upload de fichiers audio** : Mise en place de l'upload de fichiers audio pour les patients (pour la simuler des appels vocaux).
+ - **Auteur** : Laila Charaoui 5IW2 / [lailacha](https://github.com/lailacha)
+
+
   - **Auteur** : [Nom et Pseudo du Développeur]
 
 ## Équipe de Développement
